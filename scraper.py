@@ -9,9 +9,11 @@ TELEGRAM_API_URL = "https://api.telegram.org/bot{}/sendMessage"
 
 def get_api_response(url):
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "application/json",
+        "Accept-Language": "he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7",
         "Referer": "https://www.yad2.co.il/",
+        "Origin": "https://www.yad2.co.il",
     }
     try:
         response = requests.get(url, headers=headers, timeout=30)
@@ -21,13 +23,13 @@ def get_api_response(url):
             print(f"Error: Empty response from API (status {response.status_code})")
             return None
         return response.json()
-    except requests.RequestException as e:
-        print(f"Error fetching URL: {e}")
-        return None
-    except json.JSONDecodeError as e:
+    except (json.JSONDecodeError, requests.exceptions.JSONDecodeError) as e:
         snippet = (response.text[:200] + "..." if len(response.text) > 200 else response.text) if response.text else "(empty)"
         print(f"Error decoding JSON: {e}")
         print(f"Response status: {response.status_code}, body snippet: {snippet!r}")
+        return None
+    except requests.RequestException as e:
+        print(f"Error fetching URL: {e}")
         return None
 
 def extract_items(data):
