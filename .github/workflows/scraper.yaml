@@ -8,6 +8,11 @@ on:
       api_url:
         description: 'Yad2 API URL with search parameters (overrides secret)'
         required: false
+      clean:
+        description: 'Clear rentals DB before running (treat all as new)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   scraper:
@@ -35,9 +40,10 @@ jobs:
         env:
           API_TOKEN: ${{ secrets.API_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: >
-          python scraper.py
-          --api-url "${{ github.event.inputs.api_url || secrets.API_URL }}"
+        run: |
+          python scraper.py \
+            --api-url "${{ github.event.inputs.api_url || secrets.API_URL }}" \
+            ${{ github.event.inputs.clean && '--clean' || '' }}
 
       - name: Push new json data if needed
         run: |
