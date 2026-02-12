@@ -14,14 +14,20 @@ def get_api_response(url):
         "Referer": "https://www.yad2.co.il/",
     }
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
+        text = response.text
+        if not text or not text.strip():
+            print(f"Error: Empty response from API (status {response.status_code})")
+            return None
         return response.json()
     except requests.RequestException as e:
         print(f"Error fetching URL: {e}")
         return None
     except json.JSONDecodeError as e:
+        snippet = (response.text[:200] + "..." if len(response.text) > 200 else response.text) if response.text else "(empty)"
         print(f"Error decoding JSON: {e}")
+        print(f"Response status: {response.status_code}, body snippet: {snippet!r}")
         return None
 
 def extract_items(data):
@@ -106,7 +112,11 @@ def parse_args():
 
 def main():
     args = parse_args()
-    api_url = args.api_url
+    api_url = (args.api_url or "").strip()
+
+    if not api_url or not api_url.startswith("http"):
+        print("Error: API URL is required and must start with http")
+        return
 
     if args.clean:
         save_data([])
