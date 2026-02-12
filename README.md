@@ -1,35 +1,39 @@
-# Yad 2 Smart Scraper
+# Yad2 Smart Scraper
 
-Scrapes and notifies on new Yad2 items with a minimal setup.
-
----
-
-Struggling to find a high demand product in Yad2? No problem!
-The scraper will scan Yad2 and will find for you the relevant items. Once a new item has been uploaded, it will notify you with a Telegram message.
-
-The scraper will be executed approximately once in every 15 minutes (between 08:00-21:00). The cronjob is handled by Github actions - so it is not guaranteed to be executed.
-
-When new items are uploaded, the next Github actions run will push the items to a `json` file under `data` directory (it will be created automatically when needed) - so remember to `git pull` if you want to add scraping targets.
+Scrapes Yad2 rental listings and notifies via Telegram when new items appear.
 
 ---
 
-### Setup:
+## Setup
 
-To start using the scraper simply:
-1. Clone / fork the repository.
-2. Set up a Telegram bot.
-3. Add the telegram api token and chat ID. You can do it or in the `config.json` file, or in the Github secrets (more secure - recommended) `API_TOKEN` and `CHAT_ID` secrets.
-4. Add a `topic` in the `config.json` - name for the scraping topic.
-5. Add a `url` in the `config.json` - Yad2 url to scrape - the scraper does not support pagination so be specific and use Yad2 filters for better results. 
-6. Push and wait for the workflow to run.
+### GitHub Secrets
 
-If you want to disable a scraping topic, you can add a `"disabled": true` field in the `config.json` under a project in the projects list:
+Add these secrets in your repo: **Settings → Secrets and variables → Actions**
+
+| Secret | Description |
+|--------|-------------|
+| `API_TOKEN` | Telegram Bot token from [@BotFather](https://t.me/BotFather) |
+| `CHAT_ID` | Your chat ID (use [@userinfobot](https://t.me/userinfobot)) |
+| `API_URL` | Yad2 search URL (e.g. `https://gw.yad2.co.il/realestate-feed/rent/map?city=0028&area=12&...`) |
+
+### Schedule
+
+The workflow runs every 10 minutes via GitHub Actions cron.
+
+---
+
+## Usage
+
+### Local
+
+```bash
+pip install -r requirements.txt
+python scraper.py --api-url "https://gw.yad2.co.il/realestate-feed/rent/map?city=0028&area=12&..."
 ```
-"projects": [
-    {
-      "topic": "...",
-      "url": "...",
-      "disabled": true
-    }
-  ]
-```
+
+### Options
+
+| Flag | Description |
+|------|-------------|
+| `--api-url` | Yad2 API URL with search parameters (required) |
+| `--clean` | Clear rentals DB before scraping (treat all as new) |

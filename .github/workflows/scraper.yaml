@@ -2,10 +2,12 @@ name: Yad2 Scraper
 
 on:
   schedule:
-    - cron: '*/15 5-17 * * *'
+    - cron: '*/10 * * * *'
   workflow_dispatch:
-    branches:
-      - '**'
+    inputs:
+      api_url:
+        description: 'Yad2 API URL with search parameters (overrides secret)'
+        required: false
 
 jobs:
   scraper:
@@ -16,19 +18,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install packages
-        run: yarn install
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
 
       - name: Setup git config
         run: |
           git config user.name "GitHub Actions"
-          git config user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
+          git config user.email "actions@github.com"
 
       - name: Run scraper
-        run: |
-          export API_TOKEN=${{ secrets.API_TOKEN }}
-          export CHAT_ID=${{ secrets.CHAT_ID }}
-          yarn scrape
+        env:
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: >
+          python scraper.py
+          --api-url "${{ github.event.inputs.api_url || secrets.API_URL }}"
 
       - name: Push new json data if needed
         run: |
