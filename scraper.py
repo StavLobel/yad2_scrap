@@ -2,6 +2,9 @@ import requests
 import json
 import os
 import argparse
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Constants
 DATA_FILE = "data/rentals.json"
@@ -101,8 +104,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Yad2 Rental Scraper")
     parser.add_argument(
         "--api-url",
-        required=True,
-        help="Yad2 API URL with search parameters (e.g. https://gw.yad2.co.il/realestate-feed/rent/map?city=...)"
+        default=os.environ.get("API_URL"),
+        help="Yad2 API URL (or set API_URL in .env)"
     )
     parser.add_argument(
         "--clean",

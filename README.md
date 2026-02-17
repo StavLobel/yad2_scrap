@@ -28,7 +28,9 @@ The workflow runs every 10 minutes via GitHub Actions cron.
 
 ```bash
 pip install -r requirements.txt
-python scraper.py --api-url "https://gw.yad2.co.il/realestate-feed/rent/map?city=0028&area=12&..."
+cp .env.example .env   # add your API_TOKEN, CHAT_ID, API_URL
+python scraper.py --api-url "URL"   # or omit if API_URL is in .env
+python scraper.py --clean           # clear DB and treat all as new
 ```
 
 ### Options
